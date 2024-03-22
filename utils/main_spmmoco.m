@@ -1,5 +1,12 @@
-mybatchpath ='/Users/mayra/Library/CloudStorage/OneDrive-UMCG/Postdoc/spmmoco_test';
-myfilespath ='/Users/mayra/Library/CloudStorage/OneDrive-UMCG/Postdoc/CFLamUp/derivatives/fmriprep/sub-004/';
+function main_spmmoco(project)
+%set(0, 'DefaultFigureVisible','off');
+fig=figure;
+print('Starting')
+addpath(genpath('/packages/matlab/toolbox/spm12/r7771'));
+addpath(genpath('/data1/projects/dumoulinlab/Lab_members/Mayra/programs/cflaminar/utils'));
+
+mybatchpath ='/data1/projects/dumoulinlab/Lab_members/Mayra/programs/cflaminar/utils/';
+myfilespath =['/data1/projects/dumoulinlab/Lab_members/Mayra/projects/' project '/'];
 cd(myfilespath)
 subjects=dir;
 spm_jobman('initcfg');
@@ -9,7 +16,10 @@ cd (mybatchpath)
 load('batch_spmmoco.mat');
     try
         subj_dir = subjects(i).name;
-        
+        if (subjects(i).isdir==0)
+            continue;
+        end
+
         if (strcmp(subj_dir, '.')==1)
             continue;
         end
@@ -18,7 +28,7 @@ load('batch_spmmoco.mat');
             continue;
         end
 
-        if (strcmp(subj_dir, '.DS_Store')==1)
+        if (strcmp(subj_dir, 'code')==1||strcmp(subj_dir, 'sourcedata')==1||strcmp(subj_dir, 'derivatives')==1)
             continue;
         end
         
@@ -28,11 +38,16 @@ load('batch_spmmoco.mat');
 %             anat = spm_select('ExtFPListRec', pwd, '^sub.*\.nii',1);
 %            cd([myfilespath subj_dir '/func']);
            % matlabbatch{1}.spm.spatial.realign.estwrite.data{1} = cellstr(functionals);
-            cd([myfilespath '/func']);
-            functionals1 = spm_select('ExtFPListRec', pwd, '^*run-1_desc-nordic_bold.nii',1:1000);
-            functionals2 = spm_select('ExtFPListRec', pwd, '^*run-2_desc-nordic_bold.nii',1:1000);
-            functionals3 = spm_select('ExtFPListRec', pwd, '^*run-3_desc-nordic_bold.nii',1:1000);
-            functionals4 = spm_select('ExtFPListRec', pwd, '^*run-4_desc-nordic_bold.nii',1:1000);
+            cd([myfilespath subj_dir '/ses-1/func']);
+            niigzFiles=dir('*nii.gz')
+            for f=1:numel(niigzFiles)
+                niigzFile=niigzFiles(f).name
+                gunzip(niigzFile,[myfilespath subj_dir '/ses-1/func'])
+            end
+            functionals1 = spm_select('ExtFPListRec', pwd, '^*run-1_bold.nii',1:1000);
+            functionals2 = spm_select('ExtFPListRec', pwd, '^*run-2_bold.nii',1:1000);
+            functionals3 = spm_select('ExtFPListRec', pwd, '^*run-3_bold.nii',1:1000);
+            functionals4 = spm_select('ExtFPListRec', pwd, '^*run-4_bold.nii',1:1000);
             matlabbatch{1}.spm.spatial.realign.estwrite.data = {
                 cellstr(functionals1)
                 cellstr(functionals2)
@@ -45,7 +60,8 @@ load('batch_spmmoco.mat');
             spm_jobman('run', matlabbatch)
         end
     catch
-        display(['error:' lasterr]);
+        %display(['error:' lasterr]);
     end
 end
 
+end
