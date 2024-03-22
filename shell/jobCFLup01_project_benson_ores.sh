@@ -1,4 +1,5 @@
 #! /bin/bash
+#! /usr/bin/env python
 # Usage: source project_benson.sh xxx
 # Projects the labels from Benson to the subject inside derivatives/freesurfer/subject/labels
 
