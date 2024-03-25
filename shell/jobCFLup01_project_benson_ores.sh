@@ -23,4 +23,4 @@ mri_binarize --dilate 3 --i ${SURF_DIR}/mri/benson14_varea.mgz --match 1 2 3 7 8
 
 conda deactivate
 
-mv -v ${DIR_DATA_DERIV}/freesurfer/$subject ${DIR_DATA_DERIV}/fs_ores/$subject
+mv -v ${DIR_DATA_DERIV}/freesurfer/$subject ${DIR_DATA_DERIV}/fs_ores/
