@@ -32,7 +32,7 @@ for denoising in nordic nordic_sm4
 	  echo "$OUT_DIR/${subject}/ses-${session}/${denoising} folder already exists."
 	fi
 	for hemi in lh rh;
-		do for run in 1 2 3 4 5 6;
+		do for run in 1 2 3 4;
 			do if [[ ${denoising} == "nordic" ]]; then
 			filename=${subject}_ses-${session}_task-ret_run-${run}_desc-preproc_bold
       smoothing=0
