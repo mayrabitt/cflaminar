@@ -94,7 +94,56 @@ Outputs:
 -~/sub-xxx/ses-1/func:
 -~/sub-xxx/ses-1/no_nordic:
 
+### FMRIPREP SDC
+```bash
+  master -m 15 -s xxx -t func -j 12 #version 23.2.1 - 6/March/2024
+```
+Outputs:
+
+
 ### Motion Correction using SPM
 ```bash
   qsub -V job_spmmoco.sh '[ProjectName]'
+```
+Outputs:
+TODO: generate .nii.gz, remove (r)sub, copy to fmriprep/../../func 
+      rename meansub file
+
+### ROIs mask (based on the Benson atlas) to 
+```bash
+  qsub -V jobCFLup01_project_benson_ores.sh 001
+```    
+### Upsampling anat
+```bash
+  qsub -V jobCFLup02_upsampling_anat.sh 001
+```
+### Upsampling func
+```bash
+  qsub -V jobCFLup04_upsampling_func_nordicfirst.sh 001
+```
+### Upsampling boldref
+```bash
+  qsub -V jobCFLup05_upsampling_boldref_spmmoco.sh 001
+```
+### Coregistration
+- Run once to create folder structure
+- Create initial coreg matrix (manually, ITK-SNAP)
+- Re-run to coregistrate anat2func
+
+```bash
+  qsub -V job_coreg_old_.sh 001
+```
+### Apply coregistration matrix to T1w, T2w
+
+```bash
+  qsub -V job_applyTransforms.sh 001
+```
+
+### Check and crop FOV
+```bash
+  code utils/vcode_cropping.ipynb
+```
+### Run Freesurfer on upsampled anatomy 
+```bash
+  qsub -V -pe smp 16 job_freesurferHires.sh 16 001
 ```
