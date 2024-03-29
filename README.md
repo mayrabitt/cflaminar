@@ -147,3 +147,19 @@ TODO: generate .nii.gz, remove (r)sub, copy to fmriprep/../../func
 ```bash
   qsub -V -pe smp 16 job_freesurferHires.sh 16 001
 ```
+### Benson hires 
+```bash
+  conda activate mypy311 #environment where neuropythy is installed
+  qsub -V job_project_benson_hires.sh 001
+```
+
+### Resampling GM
+```bash
+  qsub -V job_resamplingGM_nordicfirst.sh 001
+```
+### Fmriprep hires
+```bash
+  copy/move fmriprep low res to fmriprep ores
+  Re-run fmriprep with hires anatomy obs: func can be the low res
+
+```
