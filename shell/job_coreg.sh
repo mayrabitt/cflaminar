@@ -56,12 +56,12 @@ if [[ ! -d $bensonMask ]]; then
   cp $UP_DIR/anat/${subject}_ses-${session}_desc-benson_mask.nii.gz $bensonMask
 fi
 
-# if [[ ! ${COREG_DIR}/init_coreg.txt ]]; then
-#   #reset number of threads
-#   export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
-#   echo "Missing init_coreg.txt in ${COREG_DIR}."
-#   exit 0
-# fi
+if [[ ! ${COREG_DIR}/init_coreg.txt ]]; then
+  #reset number of threads
+  export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+  echo "Missing init_coreg.txt in ${COREG_DIR}."
+  exit 0
+fi
 #
 # antsApplyTransforms --interpolation BSpline[5] -d 3 -i ${Moving} -r ${Moving} -o ${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1wInit.nii.gz -t ${COREG_DIR}/init_coreg.txt #initial coreg
 # Moving=${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1wInit.nii.gz
@@ -107,7 +107,7 @@ antsRegistration  --verbose 1 \
                     --convergence [500x250x100,1e-6,10] \
                     --shrink-factors 3x2x1 \
                     --smoothing-sigmas 1x0x0vox \
-                    --masks [${bensonslabMask},NULL] \
+                    --masks [${bensonslabMask},NULL]  #\
                   # --transform Syn[0.1,3,0] \
                   #   --metric CC[${Fixed},${Moving},1,4] \
                   #   --convergence [100x100x70x100x25,1e-6,10] \

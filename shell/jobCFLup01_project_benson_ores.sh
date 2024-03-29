@@ -1,5 +1,13 @@
 #! /bin/bash
 #! /usr/bin/env python
+#! /usr/bin/env bash
+#$ -N bensons_ores
+#$ -S /bin/sh
+#$ -j y
+#$ -q short.q
+#$ -o /data1/projects/dumoulinlab/Lab_members/Mayra/projects/CFLamUp/code/logs
+#$ -u bittencourt
+#$ -V
 # Usage: source project_benson.sh xxx
 # Projects the labels from Benson to the subject inside derivatives/freesurfer/subject/labels
 
@@ -7,7 +15,7 @@ subject=sub-$1
 
 export SURF_DIR=${DIR_DATA_DERIV}/freesurfer/$subject
 
-conda activate mypy311
+#conda activate mypy311
 python -m neuropythy atlas $subject --volume-export --verbose
 
 #create labels for pycortex
