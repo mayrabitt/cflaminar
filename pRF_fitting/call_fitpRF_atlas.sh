@@ -9,6 +9,6 @@
 #$ -u bittencourt
 #$ -V
 
-#arg1: subject_id, arg2: denoising, arg3: depth, arg4: ncores: depth (e.g. 001 nordic_sm4 GM 16)
+#arg1: subject_id, arg2: denoising, arg3: depth, arg4: atlas, arg5: ncores  (e.g. 001 nordic_sm4 GM benson 16)
 
-python '/data1/projects/dumoulinlab/Lab_members/Mayra/programs/cflaminar/postproc/main_fitpRF_atlas.py' $1 $2 $3 $4
+python ${PATH_HOME}/programs/cflaminar/pRF_fitting/main_fitpRF_atlas.py $1 $2 $3 $4 $5

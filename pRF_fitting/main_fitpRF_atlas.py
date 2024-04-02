@@ -21,26 +21,28 @@ from marcus_prf_eg.utils import *
 from marcus_prf_eg.plot_functions import *
 
 
-# In[60]:
-
-
 subject=f'sub-{sys.argv[1:][0]}'
 print(subject)
-#rois = ['V1']
-depth=sys.argv[3:][0]
-print(depth)
 space='fsnative'
-project='CFLamUp'
+project=os.getenv("PROJECT")
 denoising=sys.argv[2:][0]
 print(denoising)
-MAIN_PATH=f'/data1/projects/dumoulinlab/Lab_members/Mayra/projects/{project}/derivatives'
-rois = ['V1', 'V2', 'V3', 'V4', 'LO1', 'LO2','V3a', 'V3b']
+depth=sys.argv[3:][0] #'GM or depth from Wagstyl layering (e.g. 0.25)'
+print(depth)
+atlas = sys.argv[4:][0]  #'benson' or 'manual'
+print(atlas)
+ncores=int(sys.argv[5:][0])
+print(ncores)
+
+MAIN_PATH=os.getenv("DERIVATIVES")
+
+if atlas=='benson':
+    rois = ['V1', 'V2', 'V3', 'V4', 'LO1', 'LO2','V3a', 'V3b']
+elif atlas =='manual':
+    rois = ['V1', 'V2', 'V3', 'V4', 'LO1', 'LO2']
 
 
 # ## Load design matrix
-
-# In[61]:
-
 
 dm =scipy.io.loadmat(f'{MAIN_PATH}/pRFM/sub-001/ses-1/design_task-ret.mat')['stim'] #same design matrix for all subjects
 # You can see we have a binarized matrix, of a bar moving across the screen...
@@ -58,9 +60,6 @@ dm.shape
 
 
 # When setting up the model it is important to be clear what settings you are using, and make it easily reproducible. To that end it is recommended that you keep all the specific values in a .yml file, which can be loaded in (rather than hard coding "magic" numbers in your script)
-
-# In[62]:
-
 
 # Load the settings from .yml file
 prf_settings_file = f'{MAIN_PATH}/pRFM/sub-001/ses-1/fit_settings_prf_pilot1.yml' #same prf settings for all subjects
@@ -82,8 +81,6 @@ with open(prf_settings_file) as f:
 # [3] Downsample the stimulus (so that it can run faster, e.g., from 1080 x 1080 to 100 x 100)
 # 
 # If you want you could also just recreate the design matrix from same parameters you used to make the stimulus (i.e., defining bar/wedge position over time). This doesn't matter
-
-# In[63]:
 
 
 # Now we need to enter the design matrix in a way that prfpy can read it. 
@@ -135,8 +132,6 @@ print(f'Screen size in degrees of visual angle = {prf_stim.screen_size_degrees}'
 # But the units are arbitrary... We want to change it to be in psc
 # Also we can improve the SNR by averaging over the 2 runs...
 
-# In[64]:
-
 
 # # Do the averaging and baselining...
 # # During the first 20 time points, there is NO stimulation. So we use this to set the baseline
@@ -156,14 +151,10 @@ if psc_avg_ts_full.shape[1]>225:
 psc_avg_ts_full.shape
 
 
-# In[65]:
-
-
 import cortex
 import cortex.polyutils
 #select voxels in selected ROIs
 
-atlas = 'benson'
 
 if subject=='fsaverage':
     fs_dirPATH='/Volumes/May_fMRI/Inzicht_CFM/derivatives/freesurfer'
@@ -178,8 +169,6 @@ surfs = [cortex.polyutils.Surface(*d)
 
 
 # ## Mask voxels outside visual cortex based on Benson Atlas for efficiency
-
-# In[66]:
 
 
 # First we need to import the surfaces for this subject
@@ -197,9 +186,18 @@ idx_rois4, idx_vls4 = cortex.freesurfer.get_label(subject, label='benson14_varea
   hemisphere=('lh', 'rh'),
   verbose=True)
 
-#plot Benson atlas
+if atlas=='manual':
+        idx_rois5, idx_vls5=cortex.freesurfer.get_label(subject, label='manualdelin',
+            fs_dir=fs_dirPATH,
+           hemisphere=('lh','rh'),
+           verbose=True)
+        idx_vls4[idx_rois5]=idx_vls5
+
 rois_list = []
-rois_list = np.array([['V1', 'V2', 'V3', 'V4', 'LO1', 'LO2', 'V3a', 'V3b'], [1, 2, 3, 4, 7, 8, 11, 12]])
+if atlas=='benson':
+  rois_list = np.array([['V1', 'V2', 'V3', 'V4', 'LO1', 'LO2', 'V3a', 'V3b'], [1, 2, 3, 4, 7, 8, 11, 12]])
+elif atlas =='manual':
+  rois_list = np.array([['V1', 'V2', 'V3', 'V4', 'LO1', 'LO2'], [1, 2, 3, 4, 7, 8]])
 
 rois_mask=cortex.Vertex.empty(subject)
 rois_idx=cortex.Vertex.empty(subject)
@@ -223,8 +221,6 @@ psc_avg_ts_full[rois_mask.data!=1]=0
 # The Iso2DGaussianModel class is used to create an 2D gaussian model instance.
 # There are a few parameters you can set. See below (copied from prfpy documentation), for details.
 # Note you can also fit the HRF
-
-# In[67]:
 
 
 '''    
@@ -258,23 +254,17 @@ gauss_model = Iso2DGaussianModel(
 # Now we need to make a fitter, to load in the data
 # 
 
-# In[68]:
-
-
 gauss_fitter=Iso2DGaussianFitter(
     data=psc_avg_ts[:,:],    # time series
     model=gauss_model,                   # model (see above)
     #n_jobs=prf_settings['n_jobs'],  # number of jobs to use in parallelization
-    n_jobs=int(sys.argv[4:][0]),  # number of jobs to use in parallelization
+    n_jobs=ncores,  # number of jobs to use in parallelization
     )
 
 
 # ## Gaussian grid fit
 # The first stage is the 'grid fit'
 # Here we make a "grid" of possible PRF models, (different locations: polar angle, eccentricity, as well as sizes)
-
-# In[69]:
-
 
 max_eccentricity = round(prf_stim.screen_size_degrees/2) # It doesn't make sense to look for PRFs which are outside the stimulated region
 grid_nr = prf_settings['grid_nr'] # Size of the grid (i.e., number of possible PRF models). Higher number means that the grid fit will be more exact, but take longer...
@@ -301,9 +291,6 @@ hrf_2_grid = np.array([0.0]) #fixed
 
 # ## Stage 1: grid search
 
-# In[70]:
-
-
 # Amplitude bounds for gauss grid fit - set [min, max]
 gauss_grid_bounds = [[prf_settings['prf_ampl'][0],prf_settings['prf_ampl'][1]]]
 
@@ -319,6 +306,7 @@ gauss_fitter.grid_fit(
     grid_bounds=gauss_grid_bounds
     )
 
+
 print(f'Mean rsq = {np.nanmean(gauss_fitter.gridsearch_r2):.3f}')
 print(f'Max rsq = {np.nanmax(gauss_fitter.gridsearch_r2):.3f}')
 print(np.where(gauss_fitter.gridsearch_r2==np.nanmax(gauss_fitter.gridsearch_r2)))
@@ -332,8 +320,6 @@ plt.ylim(-5,5)
 # ## Stage 2: Gaussian Iterative Fit - nohrf
 # Now we can do the iterative fit. This takes the best fitting grid (from the above stage), and iteratively tweaks the parameters until the best fit is founds.
 # This takes a bit longer than the grid fit. We also need to setup the bounds for all the parameters.
-
-# In[71]:
 
 
 if prf_settings['constraints']==True:
@@ -367,9 +353,6 @@ checkrsq=np.where(np.logical_and(gauss_fitter.gridsearch_params[:,-1]>gauss_fitt
 gauss_fitter.iterative_search_params[checkrsq,:]=gauss_fitter.gridsearch_params[checkrsq,:]
 
 
-# In[72]:
-
-
 print(f'Min rsq = {np.nanmin(gauss_fitter.iterative_search_params[gauss_fitter.rsq_mask!=0,-1]):.3f}')
 print(f'Mean rsq = {np.nanmean(gauss_fitter.iterative_search_params[gauss_fitter.rsq_mask>0,-1]):.3f}')
 print(f'Max rsq = {gauss_fitter.iterative_search_params[:,-1].max():.3f}')
@@ -381,18 +364,12 @@ plt.xlim(-5,5)
 plt.ylim(-5,5)
 
 
-# In[73]:
-
-
 best_vx=np.where(gauss_fitter.iterative_search_params[:,-1]==gauss_fitter.iterative_search_params[:,-1].max())
 best_vx
-
 
 # # WELL DONE!
 # We now have a set of prf fits. 
 # 
-
-# In[74]:
 
 
 # We can now create the predicted timeseries, and compare these with the data
@@ -414,8 +391,6 @@ pred_tc=gauss_model.return_prediction(
 # * also look at how the parameters (in the title), determine the location and size of the RF
 # * varying "time_pt", you can see where the stimulus is, at different times
 # * Note that the HRF means that responses of the model will be delayed...
-
-# In[75]:
 
 
 TR_s = prf_settings['TR']
@@ -464,8 +439,6 @@ plt.rc('xtick', labelsize=22)
 add_dm_to_ts(fig, ax2, dm, TR=TR_s, dx_axs=2)
 
 
-# In[76]:
-
 
 print(f'Mean r2= {np.nanmean(gauss_fitter.iterative_search_params[gauss_fitter.rsq_mask!=0,7]):.3f}')
 print(f'Min r2= {np.min(gauss_fitter.iterative_search_params[gauss_fitter.rsq_mask==1,7]):.3f}')
@@ -480,9 +453,6 @@ print(f'Best vx r2 no_hrf_iter= {gauss_fitter.iterative_search_params[int(best_v
 print(f'Best vx r2 iter= {gauss_fitter.iterative_search_params[int(best_vx[0]),-1]:.3f}')
 
 print(f'Nvx = {np.count_nonzero(gauss_fitter.rsq_mask)} out of {rsq_mask.shape[0]}, {np.count_nonzero(gauss_fitter.rsq_mask)/rsq_mask.shape[0]*100:.1f}%')
-
-
-# In[77]:
 
 
 import pickle
