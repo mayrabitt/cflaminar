@@ -34,21 +34,24 @@ for denoising in nordic_sm4 nordic
   	 echo "$OUT_DIR/${subject}/ses-${session}/${denoising} folder already exists."
   fi
   for hemi in lh rh;
-    do for depth in 0.25 0.5 0.75;
+    do for depth in 0.0 0.5 1.0;
     	do for run in 1 2 3 4;
     		do if [[ ${denoising} == "no_denoising" ]]; then
-    		filename=${subject}_ses-${session}_task-ret_run-${run}_desc-preproc_bold
+    		    filename=${subject}_ses-${session}_task-ret_run-${run}_desc-preproc_bold
+            smoothing=0
     		elif [[ ${denoising} == "nordic" ]]; then
-    		filename=${subject}_ses-${session}_task-ret_run-${run}_desc-nordic_bold
+    		    filename=${subject}_ses-${session}_task-ret_run-${run}_desc-preproc_bold
+            smoothing=0
         elif [[ ${denoising} == "nordic_sm4" ]]; then
-  			filename=${subject}_ses-${session}_task-ret_run-${run}_desc-nordic_bold
-        SOURCE_DIR=${PROJ_DIR}/derivatives/upsampling/${subject}/ses-${session}/func/nordic
-        smoothing=4
+  			    filename=${subject}_ses-${session}_task-ret_run-${run}_desc-preproc_bold
+            SOURCE_DIR=${PROJ_DIR}/derivatives/upsampling/${subject}/ses-${session}/func/nordic
+            smoothing=4
   			fi
-        if [ "$depth" == "0.0" ]; then a=0.7 b=1.0; elif [ "$depth" == "0.5" ]; then a=0.35 b=0.65; else a=0.0 b=0.3; fi;
-    		if [ "$hemi" == "lh" ]; then h=L; else h=R; fi;
-    		mri_vol2surf --src ${SOURCE_DIR}/${filename}.nii.gz --out $OUT_DIR/${subject}/ses-${session}/${denoising}/${subject}_ses-1_task-ret_run-${run}_space-fsnative_hemi-${h}_desc-${denoising}_bold_${depth}.gii --surf equi${depth}.pial --hemi ${hemi} --out_type gii --projfrac-avg ${a} ${b} 0.1 --interp "trilinear" --regheader ${subject} --surf-fwhm ${smoothing};
+        if [ "$depth" == "0.0" ]; then a=0.67 b=1.0; elif [ "$depth" == "0.5" ]; then a=0.33 b=0.66; else a=0.0 b=0.32; fi;
+    		  if [ "$hemi" == "lh" ]; then h=L; else h=R; fi;
+            echo "Surface-smoothing: ${smoothing} FWHM"
+    		    mri_vol2surf --src ${SOURCE_DIR}/${filename}.nii.gz --out $OUT_DIR/${subject}/ses-${session}/${denoising}/${subject}_ses-1_task-ret_run-${run}_space-fsnative_hemi-${h}_desc-${denoising}_bold_${depth}.gii --surf equi${depth}.pial --hemi ${hemi} --out_type gii --projfrac-avg ${a} ${b} 0.08 --interp "trilinear" --regheader ${subject} --surf-fwhm ${smoothing} --cortex;
         done;
       done;
-  	done;
-  done
+  	 done;
+   done
