@@ -2,7 +2,7 @@
 #$ -N coreg_anat2func
 #$ -S /bin/sh
 #$ -j y
-#$ -q short.q
+#$ -q long.q
 #$ -o /data1/projects/dumoulinlab/Lab_members/Mayra/projects/CFLamUp/code/logs
 #$ -u bittencourt
 #$ -pe smp 10

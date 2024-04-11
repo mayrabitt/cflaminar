@@ -46,7 +46,7 @@ for denoising in nordic nordic_sm4
       smoothing=4
 			fi
 			if [ "$hemi" == "lh" ]; then h=L; else h=R; fi;
-			mri_vol2surf --src ${SOURCE_DIR}/${filename}.nii.gz --out $OUT_DIR/${subject}/ses-${session}/${denoising}/${subject}_ses-1_task-ret_run-${run}_space-fsnative_hemi-${h}_desc-${denoising}_bold_GM.gii --hemi ${hemi} --out_type gii --projfrac-avg ${a} ${depth} 0.2 --interp "trilinear" --regheader ${subject} --surf-fwhm $smoothing --cortex;
+			mri_vol2surf --src ${SOURCE_DIR}/${filename}.nii.gz --out $OUT_DIR/${subject}/ses-${session}/${denoising}/${subject}_ses-1_task-ret_run-${run}_space-fsnative_hemi-${h}_desc-${denoising}_bold_GM_21pts.gii --hemi ${hemi} --out_type gii --projfrac-avg ${a} ${depth} 0.05 --interp "trilinear" --regheader ${subject} --surf-fwhm $smoothing --cortex;
 			done;
 	done;
 done

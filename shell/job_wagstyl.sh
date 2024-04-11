@@ -2,7 +2,7 @@
 #$ -N wagstyl
 #$ -S /bin/sh
 #$ -j y
-#$ -q long.q
+#$ -q short.q
 #$ -o /data1/projects/dumoulinlab/Lab_members/Mayra/projects/CFLamUp/code/logs
 #$ -u bittencourt
 
@@ -10,8 +10,6 @@
 
 subject=sub-$1
 session=1
-depth=1.0
-a=0
 
 PROJ_DIR=${DIR_DATA_HOME}
 TOOL_DIR=${PATH_HOME}/programs/packages/surface_tools-master/equivolumetric_surfaces
@@ -20,5 +18,5 @@ OUT_DIR=${FS_DIR}/${subject}/surf
 
 for hemi in lh rh
 do
-python ${TOOL_DIR}/generate_equivolumetric_surfaces.py --smoothing 0 ${FS_DIR}/${subject}/surf/${hemi}.pial ${FS_DIR}/${subject}/surf/${hemi}.white 5 ${OUT_DIR}/${hemi}.equi --software freesurfer --subject_id ${subject}
+python ${TOOL_DIR}/generate_equivolumetric_surfaces.py --smoothing 0 ${FS_DIR}/${subject}/surf/${hemi}.white ${FS_DIR}/${subject}/surf/${hemi}.pial 9 ${OUT_DIR}/${hemi}.equi --software freesurfer --subject_id ${subject}
 done
