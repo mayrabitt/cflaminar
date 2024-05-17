@@ -15,7 +15,7 @@ cd ${DERIVATIVES}/spm/${subject}/ses-1/func
 
 ls | grep '^sub.*\.nii$' | grep -v '^rsub.*\.nii$' | xargs rm
 
-for run in 1 2 3 4;
+for run in 1 2 3 4 5 6;
 do
     mv ${DERIVATIVES}/spm/${subject}/ses-1/func/r${subject}_ses-1_task-ret_run-${run}_desc-preproc_bold.nii ${DERIVATIVES}/spm/${subject}/ses-1/func/${subject}_ses-1_task-ret_run-${run}_desc-preproc_bold.nii 
 done

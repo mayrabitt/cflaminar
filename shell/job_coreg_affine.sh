@@ -38,6 +38,7 @@ fi
 Fixed=${COREG_DIR}/${subject}_ses-${session}_task-ret_run-1_boldref.nii.gz
 Fixed_sk=${COREG_DIR}/${subject}_ses-${session}_task-ret_run-1_boldref_sk.nii.gz
 Moving=${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1w.nii.gz
+Moving_affine=${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1wAffine.nii.gz
 Moving_sk=${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1w_sk.nii.gz
 spmMask=${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-spm_mask.nii.gz
 bensonMask=${COREG_DIR}/${subject}_ses-${session}_desc-benson_mask.nii.gz
@@ -69,9 +70,7 @@ bensonslabMask=${COREG_DIR}/${subject}_ses-${session}_desc-benson_slabmask.nii.g
 3dresample -master ${slabMask} -prefix ${bensonslabMask} -input ${bensonMask} -overwrite
 
 #Skullstrip func e T1w
-fslmaths ${Moving} -mas ${spmMask} ${Moving_sk}
-antsApplyTransforms --interpolation BSpline[5] -d 3 -i ${Moving_sk} -r ${Moving_sk} -o ${Moving_sk} -t ${PROJ_DIR}/derivatives/coreg/${subject}/ses-1/init_coreg.txt #forward transform
-
+fslmaths ${Moving_affine} -mas ${spmMask} ${Moving_sk}
 fslmaths ${Fixed} -mas ${slabMask} ${Fixed_sk}
 
 
@@ -89,32 +88,32 @@ antsRegistration  --verbose 1 \
                   --collapse-output-transforms 1 \
                   --output [${outputPrefix},${outputPrefix}Warped.nii.gz,${outputPrefix}InverseWarped.nii.gz] \
                   --transform Rigid[0.2] \
-                    --metric MI[${Fixed_sk},${Moving_sk},1,32,Regular,0.25] \
-                    --convergence [1000x500x250x100,1e-6,10] \
-                    --shrink-factors 12x8x4x2 \
-                    --smoothing-sigmas 4x3x2x1vox \
-                    --masks [${bensonslabMask},${bensonslabMask}] \
+                  --metric MI[${Fixed_sk},${Moving_sk},1,32,Regular,0.25] \
+                  --convergence [1000x500x250x100,1e-6,10] \
+                  --shrink-factors 12x8x4x2 \
+                  --smoothing-sigmas 4x3x2x1vox \
+                  --masks [${bensonslabMask},${bensonslabMask}] \
                   --transform Affine[0.2] \
-                    --metric MI[${Fixed_sk},${Moving_sk},1,32,Regular,0.25] \
-                    --convergence [1000x500x250x100,1e-6,10] \
-                    --shrink-factors 12x8x4x2 \
-                    --smoothing-sigmas 4x3x2x1vox \
-                    --masks [${bensonslabMask},${bensonslabMask}] \
-                  --transform Syn[0.1,3,0] \
-                    --metric CC[${Fixed_sk},${Moving_sk},1,4] \
-                    --convergence [50x50x200x200x300,1e-6,10] \
-                    --shrink-factors 10x6x4x2x1 \
-                    --smoothing-sigmas 5x3x2x1x0vox \
-                    --masks [${bensonslabMask},${bensonslabMask}]
+                  --metric MI[${Fixed_sk},${Moving_sk},1,32,Regular,0.25] \
+                  --convergence [1000x500x250x100,1e-6,10] \
+                  --shrink-factors 12x8x4x2 \
+                  --smoothing-sigmas 4x3x2x1vox \
+                  --masks [${bensonslabMask},${bensonslabMask}] #\
+                #   --transform Syn[0.1,3,0] \
+                #   --metric CC[${Fixed_sk},${Moving_sk},1,4] \
+                #   --convergence [50x50x200x200x300,1e-6,10] \
+                #   --shrink-factors 10x6x4x2x1 \
+                #   --smoothing-sigmas 5x3x2x1x0vox \
+                #   --masks [${bensonslabMask},${bensonslabMask}]
 
-echo "Transform matrix calculated."
+# echo "Transform matrix calculated."
 
 #antsApplyTransforms --interpolation BSpline[5] -d 3 -i ${Fixed} -r ${Fixed} -o ${COREG_DIR}/WarpedANAT.nii.gz -t [${outputPrefix}0GenericAffine.mat, 1]
 
 #Affine for checking before applying Syn warping
-antsApplyTransforms --interpolation BSpline[5] -d 3 -i ${Moving} -r ${Moving} -o ${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1wAffine.nii.gz -t ${outputPrefix}0GenericAffine.mat  -t ${PROJ_DIR}/derivatives/coreg/${subject}/ses-1/init_coreg.txt #forward transform
+antsApplyTransforms --interpolation BSpline[5] -d 3 -i ${Moving_affine} -r ${Moving_affine} -o ${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1wAffine2.nii.gz -t ${outputPrefix}0GenericAffine.mat #forward transform
 #Syn warping
-antsApplyTransforms --interpolation BSpline[5] -d 3 -i ${Moving} -r ${Moving} -o ${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1wWarped.nii.gz -t ${outputPrefix}1Warp.nii.gz -t ${outputPrefix}0GenericAffine.mat -t ${PROJ_DIR}/derivatives/coreg/${subject}/ses-1/init_coreg.txt #forward transform
+#antsApplyTransforms --interpolation BSpline[5] -d 3 -i ${Moving} -r ${Moving} -o ${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1wWarped.nii.gz -t ${outputPrefix}1Warp.nii.gz -t ${outputPrefix}0GenericAffine.mat #forward transform
 
 #reset number of threads
 export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1

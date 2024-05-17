@@ -27,4 +27,4 @@ done
 
 conda deactivate
 
-cp -r ${SURF_DIR} ${DIR_DATA_DERIV}/fs_hires
+#cp -r ${SURF_DIR} ${DIR_DATA_DERIV}/fs_hires

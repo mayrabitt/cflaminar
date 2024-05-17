@@ -34,7 +34,7 @@ do
     echo "$UP_DIR  folder already exists."
   fi
 
-  for suffix in ret_run-1 ret_run-2 ret_run-3 ret_run-4
+  for suffix in ret_run-1 ret_run-2 ret_run-3 ret_run-4 ret_run-5 ret_run-6
   do
     if [[ ${denoising} == "nordic" ]]; then
     NII_DIR=$PROJ_DIR/derivatives/fmriprep/${subject}/ses-${session}/func
