@@ -15,7 +15,7 @@ subject=sub-$1
 
 export SURF_DIR=${DIR_DATA_DERIV}/freesurfer/$subject
 
-#conda activate mypy311 # not necessary, should be activated in the terminal though
+conda activate mypy311 # not necessary, should be activated in the terminal though
 python -m neuropythy atlas $subject --volume-export --verbose
 
 #create labels for pycortex
