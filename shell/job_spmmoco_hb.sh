@@ -22,10 +22,10 @@ subject=sub-$1
 task=$2
 ses=$3
 nruns=$4
-SPM_DIR=${PROJ_DIR}/derivatives/spm/
+SPM_DIR=${PROJ_DIR}/derivatives/spm
 NoMoCo_DIR=${SPM_DIR}/${subject}/ses-${ses}/no_moco
 OUT_DIR=${SPM_DIR}/${subject}/ses-${ses}/func
-fmriprep_DIR=${PROJ_DIR}/derivatives/fmriprep/
+fmriprep_DIR=${PROJ_DIR}/derivatives/fmriprep
 
 
 if [[ ! -d $NoMoCo_DIR ]]; then
