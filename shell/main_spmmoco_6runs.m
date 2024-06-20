@@ -12,7 +12,7 @@ spm_jobman('initcfg');
 
 cd(mybatchpath)
 load('batch_spmmoco_6runs.mat');
-
+%copy func files
 cd ([myfilespath 'sub-' subject '/ses-1/no_moco']);
 niigzFiles=dir('*nii.gz')
 for f=1:numel(niigzFiles)
