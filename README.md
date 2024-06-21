@@ -113,7 +113,7 @@ TODO: generate .nii.gz, remove (r)sub, copy to fmriprep/../../func
 ```
 ### Upsampling func
 ```bash
-  qsub -V jobCFLup04_upsampling_func_nordicfirst.sh 001 #'[subject] [task] [session] [run]'
+  qsub -V jobCFLup04_upsampling_func_nordicfirst.sh 001 ret 1 4 0.8 #'[subject] [task] [session] [nruns] [new_resolution]'
 ```
 ### Upsampling boldref
 ```bash
