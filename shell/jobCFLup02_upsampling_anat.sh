@@ -31,9 +31,9 @@ if [[ ! -d $UP_DIR ]]; then
 else
   echo "anat folder already exists."
 fi
-echo ${ACQ}
+echo "Acquisition: ${ACQ}"
 
-for suffix in acq-"$ACQ"_T1w acq-${ACQ}_desc-spm_mask acq-${ACQ}_T1map  acq-${ACQ}_desc-masked_T1w desc-benson_mask acq-3DTSE_T2w
+for suffix in acq-${ACQ}_T1w acq-${ACQ}_desc-spm_mask acq-${ACQ}_T1map  acq-${ACQ}_desc-masked_T1w desc-benson_mask acq-3DTSE_T2w
 do
   if [[ ${suffix} == "acq-3DTSE_T2w" ]]; then
   NII_DIR=$PROJ_DIR/derivatives/pymp2rage/${subject}/ses-${session}
