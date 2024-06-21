@@ -10,15 +10,15 @@
 # Load modules
 module load afni
 
-# Usage: source job_upsampling_anat.sh xxx /qsub -V script.sh xxx
+# Usage: qsub -V job_upsampling_anat.sh [subject] [session] /E.g. sub -V script.sh 001 1
 # Upsamples Nifti files
 
 subject=sub-$1
-session=1
-echo "Running subject: $subject"
+session=$2
+echo "Running subject: $subject, session $session"
 
 OLDPWD=${PWD}
-PROJ_DIR=/data1/projects/dumoulinlab/Lab_members/Mayra/projects/CFLamUp
+PROJ_DIR={DIR_DATA_HOME}
 cd $PROJ_DIR
 
 # ANAT
