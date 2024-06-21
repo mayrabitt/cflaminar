@@ -9,16 +9,16 @@
 # Load modules
 module load afni
 
-# Usage: source upsampling.sh sub-xxx / qsub -V script.sh sub-xxx
+# Usage: source script_name.sh [subject] [session] [new resolution]/E.g. qsub -V script.sh 001 1 0.8
 # Upsamples Nifti files
 
 subject=sub-$1
-session=1
+session=$2
 
 module load fsl
 
 OLDPWD=${PWD}
-PROJ_DIR=/data1/projects/dumoulinlab/Lab_members/Mayra/projects/CFLamUp
+PROJ_DIR=${DIR_DATA_HOME}
 cd $PROJ_DIR
 
 # Boldref
@@ -33,7 +33,7 @@ if [[ ! -d $UP_DIR ]]; then
   exit 1
 fi
 
-NII_DIR=$PROJ_DIR/derivatives/spm/${subject}/ses-1/func
+NII_DIR=$PROJ_DIR/derivatives/spm/${subject}/ses-${session}/func
 suffix='ret_run-1' 
 filename=${subject}_ses-${session}_task-${suffix}_boldref
 if [[ ! -f ${UP_DIR}/${filename}_ores.nii.gz ]]; then
@@ -41,7 +41,7 @@ cp ${NII_DIR}/${filename}.nii.gz ${UP_DIR}/${filename}_ores.nii.gz
 else
 echo "backup of original resolution ${suffix} file already exists"
 fi
-3dresample -dxyz 0.4 0.4 0.4 -rmode Cubic -prefix ${UP_DIR}/${filename}.nii.gz -input ${NII_DIR}/${filename}.nii.gz -overwrite
+3dresample -dxyz ${new_res} ${new_res} ${new_res} -rmode Cubic -prefix ${UP_DIR}/${filename}.nii.gz -input ${NII_DIR}/${filename}.nii.gz -overwrite
 echo "replaced original ${suffix} file by upsampled in ${UP_DIR}."
 
 cd ${OLDPWD}
