@@ -9,13 +9,14 @@
 # Load modules
 module load afni
 
-# Usage: source script_name.sh [subject] [session] [task] [nruns]/E.g. qsub -V script_name.sh 001 1 ret 4
+# Usage: source script_name.sh [subject] [session] [task] [nruns] [new_resolution]/E.g. qsub -V script_name.sh 001 1 ret 4 0.8
 # Upsamples Nifti files
 
 subject=sub-$1
 session=$2
 task=$3
 nruns=$4
+new_res=$5
 
 OLDPWD=${PWD}
 PROJ_DIR=${DIR_DATA_HOME}
@@ -49,7 +50,8 @@ do
     # filename=${subject}_ses-${session}_task-${suffix}_bold
     fi
     if [[ ! -f ${UP_DIR}/${filename}.nii.gz ]]; then
-    3dresample -dxyz 0.4 0.4 0.4 -rmode Cubic -prefix ${UP_DIR}/${filename}.nii.gz -input ${NII_DIR}/${filename}.nii.gz
+    3dresample -dxyz ${new_res} ${new_res} ${new_res} -rmode Cubic -prefix ${UP_DIR}/${filename}.nii.gz -input ${NII_DIR}/${filename}.nii.gz
+    echo "Upsampling of run ${run} completed."
     # Backing up and replacing files with original resolution by upsampled files
     if [[ ! -f ${UP_DIR}/${filename}_ores.nii.gz ]]; then
       cp ${NII_DIR}/${filename}.nii.gz ${UP_DIR}/${filename}_ores.nii.gz
