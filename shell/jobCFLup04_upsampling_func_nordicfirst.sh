@@ -9,14 +9,16 @@
 # Load modules
 module load afni
 
-# Usage: source upsampling.sh xxx / qsub -V script.sh xxx
+# Usage: source script_name.sh [subject] [session] [task] [nruns]/E.g. qsub -V script_name.sh 001 1 ret 4
 # Upsamples Nifti files
 
 subject=sub-$1
-session=1
+session=$2
+task=$3
+nruns=$4
 
 OLDPWD=${PWD}
-PROJ_DIR=/data1/projects/dumoulinlab/Lab_members/Mayra/projects/CFLamUp
+PROJ_DIR=${DIR_DATA_HOME}
 cd $PROJ_DIR
 
 # Fmriprep - No NORDIC, No Pybest
@@ -34,11 +36,11 @@ do
     echo "$UP_DIR  folder already exists."
   fi
 
-  for suffix in ret_run-1 ret_run-2 ret_run-3 ret_run-4 ret_run-5 ret_run-6
+  for run in $(seq "$nruns")
   do
     if [[ ${denoising} == "nordic" ]]; then
     NII_DIR=$PROJ_DIR/derivatives/fmriprep/${subject}/ses-${session}/func
-    filename=${subject}_ses-${session}_task-${suffix}_desc-preproc_bold
+    filename=${subject}_ses-${session}_task-${task}_run-${run}_desc-preproc_bold
     # elif [[ ${denoising} == "nordic" ]]; then
     # NII_DIR=$PROJ_DIR/${subject}/ses-1/func
     # filename=${subject}_ses-${session}_task-${suffix}_desc-nordic_bold
