@@ -10,11 +10,12 @@
 # Load modules
 module load afni
 
-# Usage: qsub -V job_upsampling_anat.sh [subject] [session] /E.g. sub -V script.sh 001 1
+# Usage: qsub -V job_upsampling_anat.sh [subject] [session] [new resolution]/E.g. sub -V script.sh 001 1 0.8
 # Upsamples Nifti files
 
 subject=sub-$1
 session=$2
+new_res=${3}
 echo "Running subject: $subject, session $session"
 
 OLDPWD=${PWD}
@@ -30,11 +31,11 @@ if [[ ! -d $UP_DIR ]]; then
 else
   echo "anat folder already exists."
 fi
-for suffix in acq-MP2RAGE_T1w acq-MP2RAGE_desc-spm_mask acq-MP2RAGE_T1map acq-3DTSE_T2w acq-MP2RAGE_desc-masked_T1w desc-benson_mask
+for suffix in acq-${ACQ}_T1w acq-${ACQ}_desc-spm_mask acq-MP2RAGE_T1map  acq-${ACQ}_desc-masked_T1w desc-benson_mask acq-3DTSE_T2w
 do
   if [[ ${suffix} == "acq-3DTSE_T2w" ]]; then
   NII_DIR=$PROJ_DIR/derivatives/pymp2rage/${subject}/ses-${session}
-  elif [[ ${suffix} == "acq-MP2RAGE_desc-masked_T1w" ]]; then
+  elif [[ ${suffix} == "acq-${ACQ}_desc-masked_T1w" ]]; then
   NII_DIR=$PROJ_DIR/derivatives/masked_mp2rage/${subject}/ses-${session}/anat
   elif [[ ${suffix} == "desc-benson_mask" ]]; then
   NII_DIR=${DIR_DATA_DERIV}/benson_mask/${subject}/ses-${session}
@@ -49,7 +50,7 @@ do
   fi
   if [[ ! -f ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz ]]; then
   cp ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz
-  3dWarp -deoblique -prefix ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -newgrid 0.4 ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -overwrite > ${UP_DIR}/orient${suffix}_ores.1D
+  3dWarp -deoblique -prefix ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -newgrid ${new_res} ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -overwrite > ${UP_DIR}/orient${suffix}_ores.1D
 
   # 3dresample -dxyz 0.4 0.4 0.4 -rmode Cu -overwrite -prefix ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -input ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz
   # 3dWarp -deoblique ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz -overwrite > ${UP_DIR}/orient${suffix}_ores.1D
