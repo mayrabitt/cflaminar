@@ -15,7 +15,7 @@ module load afni
 
 subject=sub-$1
 session=$2
-new_res=${3}
+new_res=$3
 echo "Running subject: $subject, session $session"
 
 OLDPWD=${PWD}
@@ -31,11 +31,11 @@ if [[ ! -d $UP_DIR ]]; then
 else
   echo "anat folder already exists."
 fi
-for suffix in acq-${ACQ}_T1w acq-${ACQ}_desc-spm_mask acq-MP2RAGE_T1map  acq-${ACQ}_desc-masked_T1w desc-benson_mask acq-3DTSE_T2w
+for suffix in acq-${ACQ}_T1w acq-${ACQ}_desc-spm_mask acq-${ACQ}_T1map  acq-${ACQ}_desc-masked_T1w desc-benson_mask acq-3DTSE_T2w
 do
   if [[ ${suffix} == "acq-3DTSE_T2w" ]]; then
   NII_DIR=$PROJ_DIR/derivatives/pymp2rage/${subject}/ses-${session}
-  elif [[ ${suffix} == "acq-${ACQ}_desc-masked_T1w" ]]; then
+  elif [[ ${suffix} == acq-${ACQ}_desc-masked_T1w ]]; then
   NII_DIR=$PROJ_DIR/derivatives/masked_mp2rage/${subject}/ses-${session}/anat
   elif [[ ${suffix} == "desc-benson_mask" ]]; then
   NII_DIR=${DIR_DATA_DERIV}/benson_mask/${subject}/ses-${session}
