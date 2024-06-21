@@ -18,7 +18,7 @@ session=$2
 echo "Running subject: $subject, session $session"
 
 OLDPWD=${PWD}
-PROJ_DIR={DIR_DATA_HOME}
+PROJ_DIR=${DIR_DATA_HOME}
 cd $PROJ_DIR
 
 # ANAT
