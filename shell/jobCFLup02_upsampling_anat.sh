@@ -38,19 +38,19 @@ echo "Acquisition: ${ACQ}"
 for suffix in acq-${ACQ}_T1w acq-${ACQ}_desc-masked_T1w desc-benson_mask acq-3DTSE_T2w acq-${ACQ}_desc-spm_mask
 do
   if [[ ${suffix} == "acq-3DTSE_T2w" ]]; then
-  NII_DIR=$PROJ_DIR/derivatives/pymp2rage/${subject}/ses-${session}
+    NII_DIR=$PROJ_DIR/derivatives/pymp2rage/${subject}/ses-${session}
   elif [[ ${suffix} == "acq-${ACQ}_desc-masked_T1w" ]]; then
-  NII_DIR=$PROJ_DIR/derivatives/masked_mp2rage/${subject}/ses-${session}/anat
+    NII_DIR=$PROJ_DIR/derivatives/masked_mp2rage/${subject}/ses-${session}/anat
   elif [[ ${suffix} == "desc-benson_mask" ]]; then
-  NII_DIR=${DIR_DATA_DERIV}/benson_mask/${subject}/ses-${session}
+    NII_DIR=${DIR_DATA_DERIV}/benson_mask/${subject}/ses-${session}
   elif [[ ${suffix} == "desc-spm_mask" ]]; then
-  NII_DIR=$PROJ_DIR/derivatives/denoised/${subject}/ses-${session}
-    if [[ -f ${NII_DIR}/${subject}_ses-${session}_${suffix}.nii.gz]]; then
+    NII_DIR=$PROJ_DIR/derivatives/denoised/${subject}/ses-${session}
+    if [[ -f ${NII_DIR}/${subject}_ses-${session}_${suffix}.nii.gz ]]; then
+      echo "${suffix} not found, using fmriprep brain_mask instead."
       NII_DIR=$PROJ_DIR/derivatives/fmriprep/${subject}/ses-${session}/anat
       suffix=acq-${ACQ}_desc-brain_mask
-    else
-      NII_DIR=$PROJ_DIR/derivatives/denoised/${subject}/ses-${session}
     fi
+  fi
   # Backing up original resolution files
   if [[ ! -f ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz ]]; then
     cp ${NII_DIR}/${subject}_ses-${session}_${suffix}.nii.gz ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz
@@ -58,16 +58,16 @@ do
     echo "backup of original resolution ${suffix} file already exists"
   fi
   if [[ ! -f ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz ]]; then
-  cp ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz
-  3dWarp -deoblique -prefix ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -newgrid ${new_res} ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -overwrite > ${UP_DIR}/orient${suffix}_ores.1D
+    cp ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz
+    3dWarp -deoblique -prefix ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -newgrid ${new_res} ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -overwrite > ${UP_DIR}/orient${suffix}_ores.1D
 
   # 3dresample -dxyz 0.4 0.4 0.4 -rmode Cu -overwrite -prefix ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -input ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz
   # 3dWarp -deoblique ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz -overwrite > ${UP_DIR}/orient${suffix}_ores.1D
   # 3dAllineate -trilinear -1Dmatrix_apply ${UP_DIR}/orient${suffix}_ores.1D -prefix ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz -overwrite
-  cp -TRv ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz ${NII_DIR}/${subject}_ses-${session}_${suffix}.nii.gz
-  echo "${suffix} upsampled."
+    cp -TRv ${UP_DIR}/${subject}_ses-${session}_${suffix}.nii.gz ${NII_DIR}/${subject}_ses-${session}_${suffix}.nii.gz
+    echo "${suffix} upsampled."
   else
-  echo "${suffix} upsampled already exists."
+    echo "${suffix} upsampled already exists."
   fi
 done
 
