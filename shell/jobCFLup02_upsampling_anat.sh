@@ -48,9 +48,9 @@ do
     if [[ -f ${NII_DIR}/${subject}_ses-${session}_${suffix}.nii.gz]]; then
       NII_DIR=$PROJ_DIR/derivatives/fmriprep/${subject}/ses-${session}/anat
       suffix=acq-${ACQ}_desc-brain_mask
-  else
-  NII_DIR=$PROJ_DIR/derivatives/denoised/${subject}/ses-${session}
-  fi
+    else
+      NII_DIR=$PROJ_DIR/derivatives/denoised/${subject}/ses-${session}
+    fi
   # Backing up original resolution files
   if [[ ! -f ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz ]]; then
     cp ${NII_DIR}/${subject}_ses-${session}_${suffix}.nii.gz ${UP_DIR}/${subject}_ses-${session}_${suffix}_ores.nii.gz
