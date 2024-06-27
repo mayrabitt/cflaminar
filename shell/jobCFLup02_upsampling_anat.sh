@@ -9,8 +9,9 @@
 
 # Load modules
 module load afni
+module load AFNI #Habrok
 
-# Usage: qsub -V job_upsampling_anat.sh [subject] [session] [new resolution]/E.g. sub -V script.sh 001 1 0.8
+# Usage: qsub -V job_upsampling_anat.sh [subject] [session] [new resolution]/E.g. qsub -V script.sh 001 1 0.8
 # Upsamples Nifti files
 
 subject=sub-$1
@@ -20,6 +21,7 @@ echo "Running subject: $subject, session $session"
 
 OLDPWD=${PWD}
 PROJ_DIR=${DIR_DATA_HOME}
+
 cd $PROJ_DIR
 
 # ANAT
@@ -33,7 +35,7 @@ else
 fi
 echo "Acquisition: ${ACQ}"
 
-for suffix in acq-${ACQ}_T1w acq-${ACQ}_desc-spm_mask acq-${ACQ}_T1map  acq-${ACQ}_desc-masked_T1w desc-benson_mask acq-3DTSE_T2w
+for suffix in acq-${ACQ}_T1w acq-${ACQ}_desc-masked_T1w desc-benson_mask acq-3DTSE_T2w acq-${ACQ}_desc-spm_mask
 do
   if [[ ${suffix} == "acq-3DTSE_T2w" ]]; then
   NII_DIR=$PROJ_DIR/derivatives/pymp2rage/${subject}/ses-${session}
@@ -41,6 +43,11 @@ do
   NII_DIR=$PROJ_DIR/derivatives/masked_mp2rage/${subject}/ses-${session}/anat
   elif [[ ${suffix} == "desc-benson_mask" ]]; then
   NII_DIR=${DIR_DATA_DERIV}/benson_mask/${subject}/ses-${session}
+  elif [[ ${suffix} == "desc-spm_mask" ]]; then
+  NII_DIR=$PROJ_DIR/derivatives/denoised/${subject}/ses-${session}
+    if [[ -f ${NII_DIR}/${subject}_ses-${session}_${suffix}.nii.gz]]; then
+      NII_DIR=$PROJ_DIR/derivatives/fmriprep/${subject}/ses-${session}/anat
+      suffix=acq-${ACQ}_desc-brain_mask
   else
   NII_DIR=$PROJ_DIR/derivatives/denoised/${subject}/ses-${session}
   fi
