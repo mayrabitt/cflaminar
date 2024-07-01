@@ -9,10 +9,12 @@
 
 # Load modules
 module load afni
+module load AFNI #Habrok
 module load ANTs
 module load fsl/6.0.5.2
+module load FSL #Habrok
 
-# Usage: source job_coreg.sh xxx OR SoGE: qsub -V job_coreg.sh 001
+# Usage: qsub -V job_coreg.sh [subject] [session] [task] e.g. qsub -V job_coreg.sh 001 1 ret
 # Upsamples Nifti files
 
 #set number of cores
@@ -21,10 +23,11 @@ export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=10
 echo "number of cores: ${ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS}"
 
 subject=sub-$1
-session=1
+session=$2
+task=$3
 
 OLDPWD=${PWD}
-PROJ_DIR=/data1/projects/dumoulinlab/Lab_members/Mayra/projects/CFLamUp
+PROJ_DIR=${DIR_DATA_HOME}
 cd $PROJ_DIR
 
 COREG_DIR=$PROJ_DIR/derivatives/coreg/${subject}/ses-${session}
@@ -35,27 +38,31 @@ else
   echo "$COREG_DIR folder already exists."
 fi
 
-Fixed=${COREG_DIR}/${subject}_ses-${session}_task-ret_run-1_boldref.nii.gz
-Fixed_sk=${COREG_DIR}/${subject}_ses-${session}_task-ret_run-1_boldref_sk.nii.gz
-Moving=${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1w.nii.gz
-Moving_sk=${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1w_sk.nii.gz
-spmMask=${COREG_DIR}/${subject}_ses-${session}_acq-MP2RAGE_desc-spm_mask.nii.gz
+Fixed=${COREG_DIR}/${subject}_ses-${session}_task-${task}_run-1_boldref.nii.gz
+Fixed_sk=${COREG_DIR}/${subject}_ses-${session}_task-${task}_run-1_boldref_sk.nii.gz
+Moving=${COREG_DIR}/${subject}_ses-${session}_acq-${ACQ}_desc-masked_T1w.nii.gz
+Moving_sk=${COREG_DIR}/${subject}_ses-${session}_acq-${ACQ}_desc-masked_T1w_sk.nii.gz
+spmMask=${COREG_DIR}/${subject}_ses-${session}_acq-${ACQ}_desc-spm_mask.nii.gz
 bensonMask=${COREG_DIR}/${subject}_ses-${session}_desc-benson_mask.nii.gz
 
 UP_DIR=$PROJ_DIR/derivatives/upsampling/${subject}/ses-${session} #folder with upsampled outputs
-if [[ ! -d $Fixed ]]; then
-  cp $UP_DIR/func/nordic/${subject}_ses-${session}_task-ret_run-1_boldref.nii.gz $Fixed
+if [[ ! -f $Fixed ]]; then
+  cp $UP_DIR/func/nordic/${subject}_ses-${session}_task-${task}_run-1_boldref.nii.gz $Fixed
 fi
 
-if [[ ! -d $Moving ]]; then
-  cp $UP_DIR/anat/${subject}_ses-${session}_acq-MP2RAGE_desc-masked_T1w.nii.gz $Moving
+if [[ ! -f $Moving ]]; then
+  cp $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-masked_T1w.nii.gz $Moving
 fi
 
-if [[ ! -d $spmMask ]]; then
-  cp $UP_DIR/anat/${subject}_ses-${session}_acq-MP2RAGE_desc-spm_mask.nii.gz $spmMask
+if [[ ! -f $spmMask ]]; then
+  if [[ ! -f $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-spm_mask.nii.gz ]]
+    cp $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-brain_mask.nii.gz $spmMask
+  else
+    cp $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-spm_mask.nii.gz $spmMask
+  fi  
 fi
 
-if [[ ! -d $bensonMask ]]; then
+if [[ ! -f $bensonMask ]]; then
   cp $UP_DIR/anat/${subject}_ses-${session}_desc-benson_mask.nii.gz $bensonMask
 fi
 
