@@ -3,9 +3,9 @@
 # ***** APPLIES TO ALL MODELS *****
 # -> hrf information
 hrf:
-  pars: [1,1,0]         # Default parameters 
-  deriv_bound: [0,10]   # If fitting the HRF these are the bounds 
-  disp_bound: [0,10]     # Generally advised to fix the dispersion value. Messing with this can get complex as you risk confounding inhibitory components 
+  pars: [1,1,0]         # Default parameters
+  deriv_bound: [0,10]   # If fitting the HRF these are the bounds
+  disp_bound: [0,0]     # Generally advised to fix the dispersion value. Messing with this can get complex as you risk confounding inhibitory components
 
 # -> Generic fitting information
 xtol: 1e-4 #fitting tolerance
@@ -16,8 +16,8 @@ rsq_threshold: 0.01  #
 TR: 3.0
 #
 filter_predictions : False # Other options to do filtering...
-n_jobs : 6 # For paralellisation, how many jobs to split off into
-n_batches : 6 # For paralellisation at grid stage...
+n_jobs : 30 # For paralellisation, how many jobs to split off into
+n_batches : 20 # For paralellisation at grid stage...
 # ***** APPLIES TO PRF MODELS *****
 # space our pRF lives in
 vf_extent: [-5, 5]

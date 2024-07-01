@@ -44,7 +44,7 @@ elif atlas =='manual':
 
 # ## Load design matrix
 
-dm =scipy.io.loadmat(f'{MAIN_PATH}/pRFM/sub-001/ses-1/design_task-ret.mat')['stim'] #same design matrix for all subjects
+dm =scipy.io.loadmat(f'{MAIN_PATH}/pRFM/design_task-ret.mat')['stim'] #same design matrix for all subjects
 # You can see we have a binarized matrix, of a bar moving across the screen...
 fig = plt.figure()
 rows = 10
@@ -62,7 +62,7 @@ dm.shape
 # When setting up the model it is important to be clear what settings you are using, and make it easily reproducible. To that end it is recommended that you keep all the specific values in a .yml file, which can be loaded in (rather than hard coding "magic" numbers in your script)
 
 # Load the settings from .yml file
-prf_settings_file = f'{MAIN_PATH}/pRFM/sub-001/ses-1/fit_settings_prf_pilot1.yml' #same prf settings for all subjects
+prf_settings_file = f'{MAIN_PATH}/pRFM/fit_settings_prf_pilot1.yml' #same prf settings for all subjects
 with open(prf_settings_file) as f:
     prf_settings = yaml.safe_load(f)
 
@@ -268,7 +268,7 @@ gauss_fitter=Iso2DGaussianFitter(
 
 max_eccentricity = round(prf_stim.screen_size_degrees/2) # It doesn't make sense to look for PRFs which are outside the stimulated region
 grid_nr = prf_settings['grid_nr'] # Size of the grid (i.e., number of possible PRF models). Higher number means that the grid fit will be more exact, but take longer...
-eccs    = np.linspace(0.1, max_eccentricity*1.5, grid_nr)  # Squared because of cortical magnification, more efficiently tiles the visual field...
+eccs    = np.linspace(0.1, max_eccentricity*1.1, grid_nr)  # Squared because of cortical magnification, more efficiently tiles the visual field...
 sizes   =  np.linspace(0.1, max_eccentricity, int(grid_nr))   # Possible size values (i.e., sigma in gaussian model)
 polars  = np.linspace(0, 2*np.pi, int(grid_nr))              # Possible polar angle coordinates
 
@@ -328,9 +328,9 @@ else:
     g_constraints = None # uses l-BFGS (which is faster)
 
 gauss_iter_bounds = [
-    (-1.5*max_eccentricity, 1.5*max_eccentricity),          # x bound
-    (-1.5*max_eccentricity, 1.5*max_eccentricity),          # y bound
-    (1e-1, 1.5*max_eccentricity),                             # prf size bounds
+    (-1.1*max_eccentricity, 1.1*max_eccentricity),          # x bound
+    (-1.1*max_eccentricity, 1.1*max_eccentricity),          # y bound
+    (1e-1, 1*max_eccentricity),                             # prf size bounds
     (prf_settings['prf_ampl'][0],prf_settings['prf_ampl'][1]),      # prf amplitude
     (prf_settings['bold_bsl'][0],prf_settings['bold_bsl'][1]),      # bold baseline (fixed)
     (prf_settings['hrf']['deriv_bound'][0], prf_settings['hrf']['deriv_bound'][1]), # hrf_1 bound
@@ -349,8 +349,8 @@ gauss_fitter.iterative_fit(
 # Rescue vxs where iterative fit was worse than grid fit
 rsq_mask=np.ones(gauss_fitter.rsq_mask.shape) #this one is based on grid fit
 rsq_mask[gauss_fitter.iterative_search_params[:,7]<prf_settings["rsq_threshold"]]=False
-checkrsq=np.where(np.logical_and(gauss_fitter.gridsearch_params[:,-1]>gauss_fitter.iterative_search_params[:,-1],gauss_fitter.iterative_search_params[:,-1]!=0))
-gauss_fitter.iterative_search_params[checkrsq,:]=gauss_fitter.gridsearch_params[checkrsq,:]
+#checkrsq=np.where(np.logical_and(gauss_fitter.gridsearch_params[:,-1]>gauss_fitter.iterative_search_params[:,-1],gauss_fitter.iterative_search_params[:,-1]!=0))
+#gauss_fitter.iterative_search_params[checkrsq,:]=gauss_fitter.gridsearch_params[checkrsq,:]
 
 
 print(f'Min rsq = {np.nanmin(gauss_fitter.iterative_search_params[gauss_fitter.rsq_mask!=0,-1]):.3f}')
@@ -491,6 +491,6 @@ def save_params(model, model_name):
     f.close()
 
 
-save_params(gauss_fitter, 'gauss_fitter')
+save_params(gauss_fitter, 'nelder-mead')
 
 
