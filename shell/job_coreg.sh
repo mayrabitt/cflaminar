@@ -51,11 +51,15 @@ if [[ ! -f $Fixed ]]; then
 fi
 
 if [[ ! -f $Moving ]]; then
-  cp $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-masked_T1w.nii.gz $Moving
+  if [[ ! -f $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-masked_T1w.nii.gz ]]; then
+    cp $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_T1w.nii.gz $Moving
+  else
+    cp $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-masked_T1w.nii.gz $Moving
+  fi  
 fi
 
 if [[ ! -f $spmMask ]]; then
-  if [[ ! -f $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-spm_mask.nii.gz ]]
+  if [[ ! -f $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-spm_mask.nii.gz ]]; then
     cp $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-brain_mask.nii.gz $spmMask
   else
     cp $UP_DIR/anat/${subject}_ses-${session}_acq-${ACQ}_desc-spm_mask.nii.gz $spmMask
