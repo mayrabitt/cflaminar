@@ -25,7 +25,15 @@ nruns=$4
 SPM_DIR=${PROJ_DIR}/derivatives/spm
 NoMoCo_DIR=${SPM_DIR}/${subject}/ses-${ses}/no_moco
 OUT_DIR=${SPM_DIR}/${subject}/ses-${ses}/func
-fmriprep_DIR=${PROJ_DIR}/derivatives/fmriprep
+
+if [[ ! -d ${PROJ_DIR}/derivatives/fmriprep/${subject} ]]
+  fmriprep_flag=0
+  INPUT_DIR=${PROJ_DIR}
+  echo "No fmriprep data found $subject."
+else
+  fmriprep_flag=1
+  INPUT_DIR=${PROJ_DIR}/derivatives/fmriprep
+  echo "Fmriprep data found for $subject."
 
 
 if [[ ! -d $NoMoCo_DIR ]]; then
@@ -43,9 +51,14 @@ else
 fi
 
 for run in $(seq "$nruns")
-do
-    cp ${fmriprep_DIR}/${subject}/ses-${ses}/func/${subject}_ses-${ses}_task-${task}_run-${run}_desc-preproc_bold.nii.gz ${NoMoCo_DIR}
-done
+if [[ $fmriprep_flag == 1 ]]; then
+  do
+     cp ${INPUT_DIR}/${subject}/ses-${ses}/func/${subject}_ses-${ses}_task-${task}_run-${run}_desc-preproc_bold.nii.gz ${NoMoCo_DIR}
+  done
+else
+  do
+     cp ${INPUT_DIR}/${subject}/ses-${ses}/func/${subject}_ses-${ses}_task-${task}_run-${run}_bold.nii.gz ${NoMoCo_DIR}
+  done
 
 cd ${PATH_HOME}/programs/cflaminar/shell
 echo "Running spmMoCo on project ${PROJECT}, ${subject}, ses-${ses}, task-${task}"
@@ -61,7 +74,7 @@ else
     break
 fi
 
-until [ -f ${OUT_DIR}/meansub-${1}_ses-${ses}_task-${task}_run-1_desc-preproc_bold.nii ]
+until [ -f ${OUT_DIR}/meansub-${1}_ses-${ses}_task-${task}_run-1_desc-preproc_bold.nii || ${OUT_DIR}/meansub-${1}_ses-${ses}_task-${task}_run-1_bold.nii]
 do
     echo "Waiting for spm MoCo to finish..."
     sleep 1
@@ -76,12 +89,21 @@ rm -r sub*
 for run in $(seq "$nruns")
 do
     gzip -c r${subject}_ses-${ses}_task-${task}_run-${run}_desc-preproc_bold.nii > ${subject}_ses-${ses}_task-${task}_run-${run}_desc-preproc_bold.nii.gz
+    gzip -c r${subject}_ses-${ses}_task-${task}_run-${run}_bold.nii > ${subject}_ses-${ses}_task-${task}_run-${run}_bold.nii.gz
 done
 
 gzip -c mean${subject}_ses-${ses}_task-${task}_run-1_desc-preproc_bold.nii > ${subject}_ses-${ses}_task-${task}_run-1_boldref.nii.gz
+gzip -c mean${subject}_ses-${ses}_task-${task}_run-1_bold.nii > ${subject}_ses-${ses}_task-${task}_run-1_boldref.nii.gz
 
 rm -r *.nii
 
-cp ${DERIVATIVES}/spm/${subject}/ses-${ses}/func/*.nii.gz ${DERIVATIVES}/fmriprep/${subject}/ses-${ses}/func/
-
+if [[ $fmriprep_flag == 1 ]]; then
+  echo "Replacing fmriprep files by SPM motion corrected files."
+  cp ${DERIVATIVES}/spm/${subject}/ses-${ses}/func/*.nii.gz ${DERIVATIVES}/fmriprep/${subject}/ses-${ses}/func/
+else
+  echo "Preparing coreg folder for manual coregistration."
+  mkdir ${DERIVATIVES}/coreg/${subject}/ses-${ses}/func
+  cp ${DERIVATIVES}/spm/${subject}/ses-${ses}/func/*.nii.gz ${DERIVATIVES}/coreg//${subject}/ses-${ses}/func/
+  mkdir ${DERIVATIVES}/coreg/${subject}/ses-${ses}/anat
+  cp ${DERIVATIVES}/denoised/${subject}/ses-${ses}/*T1w.nii.gz ${DERIVATIVES}/coreg/${subject}/ses-${ses}/anat/
 echo "Finished."
