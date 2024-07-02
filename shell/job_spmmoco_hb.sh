@@ -26,7 +26,7 @@ SPM_DIR=${PROJ_DIR}/derivatives/spm
 NoMoCo_DIR=${SPM_DIR}/${subject}/ses-${ses}/no_moco
 OUT_DIR=${SPM_DIR}/${subject}/ses-${ses}/func
 
-if [[ ! -d ${PROJ_DIR}/derivatives/fmriprep/${subject} ]]
+if [[ ! -d ${PROJ_DIR}/derivatives/fmriprep/${subject} ]]; then
   fmriprep_flag=0
   INPUT_DIR=${PROJ_DIR}
   echo "No fmriprep data found $subject."
