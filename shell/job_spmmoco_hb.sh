@@ -51,11 +51,11 @@ cd ${PATH_HOME}/programs/cflaminar/shell
 echo "Running spmMoCo on project ${PROJECT}, ${subject}, ses-${ses}, task-${task}"
 
 if [[ ${nruns} == "4" ]]; then
-    matlab -nodesktop -nodisplay -nosplash -r "main_spmmoco(${PROJECT}, '$1')"
+    matlab -nodesktop -nodisplay -nosplash -r "main_spmmoco('${PROJECT}', '$1')"
 elif [[ ${nruns} == "5" ]]; then
-    matlab -nodesktop -nodisplay -nosplash -r "main_spmmoco_5runs(${PROJECT}, '$1')"
+    matlab -nodesktop -nodisplay -nosplash -r "main_spmmoco_5runs('${PROJECT}', '$1')"
 elif [[ ${nruns} == "6" ]]; then
-    matlab -nodesktop -nodisplay -nosplash -r "main_spmmoco_6runs(${PROJECT}, '$1')"
+    matlab -nodesktop -nodisplay -nosplash -r "main_spmmoco_6runs('${PROJECT}', '$1')"
 else
     echo "Sorry, I can only process 4 to 6 runs."
     break
