@@ -6,10 +6,12 @@
 #$ -o /data1/projects/dumoulinlab/Lab_members/Mayra/projects/CFLamUp/code/logs
 #$ -u bittencourt
 
-# Usage: source script.sh xxx / qsub -V script.sh 001
+# Usage: source script_name.sh [subject] [session] [task] [nruns]/E.g. qsub -V script_name.sh 001 1 ret 4 
 
 subject=sub-$1
-session=1
+session=$2
+task=$3
+nruns=$4
 depth=1.0
 a=0
 
@@ -23,7 +25,7 @@ else
   echo "$OUT_DIR folder already exists."
 fi
 
-for denoising in nordic_sm4 nordic
+for denoising in nordic nordic_sm4
 	do SOURCE_DIR=${PROJ_DIR}/derivatives/upsampling/${subject}/ses-${session}/func/${denoising}
 	if [[ ! -d $OUT_DIR/${subject}/ses-${session}/${denoising} ]]; then
 	  echo "Creating $OUT_DIR${subject}/ses-${session}/${denoising} folder"
@@ -32,16 +34,16 @@ for denoising in nordic_sm4 nordic
 	  echo "$OUT_DIR/${subject}/ses-${session}/${denoising} folder already exists."
 	fi
 	for hemi in lh rh;
-		do for run in 1 2 3 4 5 6;
+		do for run in in $(seq "$nruns");
 			do if [[ ${denoising} == "nordic" ]]; then
-			filename=${subject}_ses-${session}_task-ret_run-${run}_desc-preproc_bold
+			filename=${subject}_ses-${session}_task-${task}_run-${run}_desc-preproc_bold
 			smoothing=0
 			elif [[ ${denoising} == "nordic_sm2" ]]; then
-			filename=${subject}_ses-${session}_task-ret_run-${run}_desc-preproc_bold
+			filename=${subject}_ses-${session}_task-${task}_run-${run}_desc-preproc_bold
 			SOURCE_DIR=${PROJ_DIR}/derivatives/upsampling/${subject}/ses-${session}/func/nordic
 			smoothing=2
 			elif [[ ${denoising} == "nordic_sm4" ]]; then
-			filename=${subject}_ses-${session}_task-ret_run-${run}_desc-preproc_bold
+			filename=${subject}_ses-${session}_task-${task}_run-${run}_desc-preproc_bold
 			SOURCE_DIR=${PROJ_DIR}/derivatives/upsampling/${subject}/ses-${session}/func/nordic
 			smoothing=4
 			fi
