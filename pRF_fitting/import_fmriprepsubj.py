@@ -4,6 +4,7 @@ from cortex import fmriprep
 import os
 from os import path as op
 import shutil
+import sys
 
 # Location of the downloaded openfmri dataset
 DERIV_PATH = os.getenv('DERIVATIVES')
