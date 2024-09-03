@@ -1,6 +1,7 @@
 # cflaminar
 Preprocessing pipeline for CF analysis across the cortical depth
 
+![Pipeline_Image](Methods_F1.pdf)
 ## In active development
 This package is still in development and its API might change. 
 
@@ -117,7 +118,7 @@ TODO: generate .nii.gz, remove (r)sub, copy to fmriprep/../../func
 ```
 ### Upsampling boldref
 ```bash
-  qsub -V jobCFLup05_upsampling_boldref_spmmoco.sh 001
+  qsub -V jobCFLup05_upsampling_boldref_spmmoco.sh 001 1 0.8 #'[subject] [session] [new_resolution]'
 ```
 ### Coregistration
 - Run once to create folder structure
@@ -161,14 +162,14 @@ TODO: generate .nii.gz, remove (r)sub, copy to fmriprep/../../func
 ## Post-processing
 ### Temporal denoising
 ```bash
-  code /Postproc/psc.ipynb #adjust subject, denoising and depth
+  code /pRF_fitting/psc.ipynb #adjust subject, denoising and depth
 ```
 Outputs:
 /derivatives/pRFM/{denoising}/*.npy  
 
 ### Import subject to pycortex database
 ```bash
-  code /Postproc/import_fmriprepsubj.ipynb #adjust subject_id
+  code /pRF_fitting/import_fmriprepsubj.ipynb #adjust subject_id
 ```
 Outputs:
 /derivatives/pRFM/{denoising}/*.npy  
