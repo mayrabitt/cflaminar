@@ -1,9 +1,9 @@
 # cflaminar
 Preprocessing pipeline for CF analysis across the cortical depth
 
-![Pipeline_Image](Methods_F1.pdf)
+![plot](https://github.com/mayrabitt/cflaminar/Methods_F1.pdf)
 ## In active development
-This package is still in development and its API might change. 
+This package is still in development and its API might change.
 
 ## Preprocessing
 
@@ -101,10 +101,10 @@ Outputs:
   qsub -V job_spmmoco.sh 001 ret 1 1 #'[subject] [task] [session] [run]'
 ```
 Outputs:
-TODO: generate .nii.gz, remove (r)sub, copy to fmriprep/../../func 
+TODO: generate .nii.gz, remove (r)sub, copy to fmriprep/../../func
       rename meansub file
 
-### ROIs mask (based on the Benson atlas) to 
+### ROIs mask (based on the Benson atlas) to
 ```bash
   qsub -V jobCFLup01_project_benson_ores.sh 001
 ```    
@@ -138,11 +138,11 @@ TODO: generate .nii.gz, remove (r)sub, copy to fmriprep/../../func
 ```bash
   code utils/vcode_cropping.ipynb
 ```
-### Run Freesurfer on upsampled anatomy 
+### Run Freesurfer on upsampled anatomy
 ```bash
   qsub -V -pe smp 16 job_freesurferHires.sh 16 001
 ```
-### Benson hires 
+### Benson hires
 ```bash
   conda activate mypy311 #environment where neuropythy is installed
   qsub -V job_project_benson_hires.sh 001
