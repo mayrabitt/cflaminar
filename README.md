@@ -1,7 +1,7 @@
 # cflaminar
 Preprocessing pipeline for CF analysis across the cortical depth
 
-![plot](https://github.com/mayrabitt/cflaminar/Methods_F1.pdf)
+![plot](https://github.com/mayrabitt/cflaminar/blob/main/Methods_F1.pdf)
 ## In active development
 This package is still in development and its API might change.
 
